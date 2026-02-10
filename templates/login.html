@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Login / Register</title>
+
+<style>
+body{
+    background:#eaf0ff;
+    font-family: Arial;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+.container{
+    width:800px;
+    height:450px;
+    background:white;
+    display:flex;
+    border-radius:15px;
+    overflow:hidden;
+}
+.left, .right{
+    width:50%;
+    padding:40px;
+}
+.right{
+    background:#6f8dfb;
+    color:white;
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+input{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border-radius:8px;
+    border:1px solid #ccc;
+}
+button{
+    width:100%;
+    padding:12px;
+    background:#6f8dfb;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+button:disabled{
+    background:#aaa;
+}
+.error{
+    color:red;
+    font-size:13px;
+}
+.hidden{
+    display:none;
+}
+@media(max-width:768px){
+    .container{
+        flex-direction:column;
+        height:auto;
+        width:95%;
+    }
+    .left,.right{width:100%;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="left">
+        <h2 id="title">Register</h2>
+
+        <div id="registerBox">
+            <input id="r_username" placeholder="Username">
+            <input id="r_email" placeholder="Email">
+            <input id="r_phone" placeholder="Phone">
+            <input id="r_password" type="password" placeholder="Password">
+            <div class="error" id="r_error"></div>
+            <button onclick="register()">Register</button>
+        </div>
+
+        <div id="loginBox" class="hidden">
+            <input id="l_email" placeholder="Email">
+            <input id="l_password" type="password" placeholder="Password">
+            <div class="error" id="l_error"></div>
+            <button onclick="login()">Login</button>
+        </div>
+    </div>
+
+    <div class="right">
+        <h1>Hello, Welcome!</h1>
+        <p id="toggleText">Already have an account?</p>
+        <button onclick="toggle()">Switch</button>
+    </div>
+</div>
+
+<script>
+let isRegister = true;
+
+function toggle(){
+    isRegister = !isRegister;
+    document.getElementById("registerBox").classList.toggle("hidden");
+    document.getElementById("loginBox").classList.toggle("hidden");
+    document.getElementById("title").innerText = isRegister ? "Register" : "Login";
+    document.getElementById("toggleText").innerText = isRegister ? "Already have an account?" : "Create a new account";
+}
+
+function register(){
+    fetch("/register",{
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify({
+            username:r_username.value,
+            email:r_email.value,
+            phone:r_phone.value,
+            password:r_password.value
+        })
+    })
+    .then(res=>res.json())
+    .then(data=>{
+        if(data.error){
+            r_error.innerText=data.error;
+        }else{
+            alert(data.message);
+            toggle();
+        }
+    });
+}
+
+function login(){
+    fetch("/login",{
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify({
+            email:l_email.value,
+            password:l_password.value
+        })
+    })
+    .then(res=>res.json())
+    .then(data=>{
+        if(data.error){
+            l_error.innerText=data.error;
+        }else{
+            alert(data.message);
+        }
+    });
+}
+</script>
+
+</body>
+</html>
